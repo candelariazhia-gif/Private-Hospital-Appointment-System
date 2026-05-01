@@ -124,13 +124,51 @@ Admin can modify:
 ### Algorithms Used
 - Priority Insertion Algorithm → manages queue order
 - Linear Search → used for ID search
-- Sequential Scheduling Algorithm → assigns room time slots
-- String Matching → compares IDs and records
+- Time Slot Scheduling (Sequential Allocation) → assigns room-based appointment times in 30-minute intervals
 
 ---
 
 ## How to Compile and Run
+This section explains how to compile and run the Private Hospital Appointment System written in C. Follow the steps carefully depending on your operating system.
 
-### Compile the Program
+---
+
+## 1. Requirements
+Before running the program, make sure you have the following installed:
+
+- A C compiler (GCC recommended)
+- A terminal or command prompt
+- A text editor or IDE (optional, for viewing code)
+
+To check if GCC is installed, run:
 ```bash
+gcc --version
+
+To run the system:
+
+1. Save the file as:
+
+hospital.c
+
+2. Open terminal in the file location
+
+3. Compile the program using:
+
 gcc hospital.c -o hospital
+
+
+4. Run the program:
+
+Windows:
+
+hospital.exe
+
+
+Linux / Mac:
+
+./hospital
+
+
+The program will then start and allow you to use the hospital appointment system.
+
+---
