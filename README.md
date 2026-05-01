@@ -117,14 +117,16 @@ Admin can modify:
 ## Data Structures and Algorithms
 
 ### Data Structures Used
-- Array → checkup types, doctors, history storage
-- Linked List → patient queue system
-- Queue concept → history tracking
+
+- Arrays – used for check-up types, doctor lists, room scheduling system, and patient history storage
+- Linked List – used to implement the main patient queue and supports booking, viewing, canceling, serving, emergency handling, and editing of appointments
+- Queue – defines the logical ordering of patients based on priority and arrival, and supports the serving sequence and history flow
 
 ### Algorithms Used
-- Priority Insertion Algorithm → manages queue order
-- Linear Search → used for ID search
-- Time Slot Scheduling (Sequential Allocation) → assigns room-based appointment times in 30-minute intervals
+
+- Priority Insertion Algorithm → manages the ordering of patients in the linked list based on priority level (Emergency, Senior/Pregnant, Normal). This directly supports the Book Appointment feature, ensuring that higher-priority patients are placed at the front of the queue while still maintaining first-come-first-served order within the same priority level. It also affects Serve Patient and Now Serving display since these rely on correct queue order.
+
+- Linear Search → used to locate a patient’s record by Ticket ID by scanning the linked list node-by-node. This supports the View My Appointment feature, Cancel Appointment feature, and Edit Appointment feature, where the system must find a specific patient before performing any operation on their record.
 
 ---
 
