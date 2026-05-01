@@ -1,144 +1,136 @@
-# 🏥 Private Hospital Appointment System
+# Private Hospital Appointment System
 
-## 📌 Overview
-A simple hospital appointment system in C language that allows patients to book, view, and cancel appointments while the admin can manage, serve, and track patients using a priority-based queue system with scheduling and room management.
-
----
-
-## 🎯 Purpose
-The system is designed to:
-- Organize patient appointments efficiently  
-- Handle emergency cases properly  
-- Prevent scheduling conflicts  
-- Keep records of served patients  
+## Overview
+A simple hospital appointment system written in C language that manages patient appointments using a priority-based queue system. It allows patients to book, view, and cancel appointments, while the admin can manage, serve, and track patients efficiently. The system also includes room-based scheduling and conflict prevention.
 
 ---
 
-## 👥 User Roles
-
-### 👤 Patient
-Patients can:
-- Book an appointment  
-- View their appointment details  
-- Cancel their appointment  
-
-### 👨‍⚕️ Admin
-Admins (hospital staff) can:
-- View all appointments  
-- Serve patients  
-- Prioritize emergency cases  
-- Edit appointments  
-- View current and next patients  
-- View patient history  
+## Purpose
+This system is designed to:
+- Manage hospital appointments in an organized way
+- Prioritize emergency and special cases
+- Prevent scheduling conflicts in rooms
+- Track and manage patient flow efficiently
 
 ---
 
-## ⚙️ Features
+## User Roles
 
-### ✅ Appointment Booking
-- Patients enter their name, age, and gender  
-- Choose a check-up type  
-- Doctor and room are automatically assigned  
-- A unique ticket ID is generated  
-- Appointment must be confirmed before saving  
+### Patient
+- Book an appointment
+- View appointment details
+- Cancel appointment using Ticket ID
 
----
-
-### 🚨 Priority System
-- 1 – Emergency (highest priority)  
-- 2 – Senior / Pregnant  
-- 3 – Normal  
-
-Emergency patients are served immediately, while others follow based on priority level.
+### Admin
+- View all appointments
+- Serve patients based on priority
+- Handle emergency cases immediately
+- Edit doctor or room assignments
+- View current and next patients
+- View served patient history
 
 ---
 
-### 🕒 Room-Based Time Scheduling
-- Each room has its own schedule  
-- Starts at 7:30 AM  
-- Each appointment lasts 30 minutes  
-- Time is automatically assigned  
-- Prevents same room and time conflicts  
+## Features
+
+### Appointment Booking
+- Patient inputs personal details
+- Selects check-up type
+- System assigns doctor and room automatically
+- Generates unique Ticket ID
+- Requires confirmation before saving
 
 ---
 
-### 🆔 Unique Ticket ID System
-- A*** → Emergency  
-- B*** → Senior/Pregnant  
-- C*** → Normal  
+### Priority System
+- 1 – Emergency (highest priority)
+- 2 – Senior / Pregnant
+- 3 – Normal
 
-No duplicate IDs allowed  
-
----
-
-### 🔄 Queue System
-- Uses linked list  
-- Priority-based ordering  
-- Same priority follows first-come-first-serve  
+Patients are served based on priority, and same priority follows FIFO order.
 
 ---
 
-### 🛑 Cancel Appointment
-- Patients can cancel using Ticket ID  
-- Confirmation is required  
+### Room-Based Scheduling System
+- Each room has its own independent schedule
+- Starts at 7:30 AM
+- Each appointment is 30 minutes
+- Prevents overlapping time slots per room
+- Ensures no duplicate scheduling
 
 ---
 
-### 👨‍⚕️ Serve Patient
-- Admin serves the first patient in queue  
-- Patient is removed from queue  
-- Data is saved into history  
+### Ticket ID System
+- A*** → Emergency
+- B*** → Senior / Pregnant
+- C*** → Normal
+- Ensures no duplicate IDs
 
 ---
 
-### 🚨 Emergency Override
-- Admin can immediately serve emergency patients  
-- Skips normal queue  
+### Queue System
+- Implemented using linked list
+- Priority-based insertion
+- Maintains order within same priority (FIFO)
 
 ---
 
-### 📊 Now Serving Display
-Shows:
-- Current patient  
-- Next 3 patients  
+### Emergency Handling
+- Emergency patients are served immediately
+- Overrides normal queue order
 
 ---
 
-### 📜 Patient History
-Stores:
-- ID  
-- Name  
-- Gender  
-- Checkup  
-- Room  
-- Time  
+### Now Serving Display
+- Shows current patient being served
+- Displays next 3 patients in queue
 
 ---
 
-### ✏️ Edit Appointment
-Admin can update:
-- Doctor  
-- Room  
+### Patient History
+Stores complete patient records:
+- ID
+- Name
+- Gender
+- Checkup type
+- Doctor
+- Room
+- Time
 
 ---
 
-### 🛡️ Input Validation
-- Numbers only for numeric input  
-- Letters only for names  
-- Valid gender input (F/M)  
-- Valid menu choices  
+### Edit Appointment
+Admin can modify:
+- Assigned doctor
+- Room number
 
 ---
 
-## 🧠 Data Structures Used
-- Linked List → patient queue  
-- Array → patient history  
-- Struct → patient records  
+### Input Validation
+- Numbers only for numeric inputs
+- Letters only for names
+- Valid gender input (F/M)
+- Valid menu selection
 
 ---
 
-## ▶️ How to Run
+## Data Structures and Algorithms
 
-1. Compile the program:
+### Data Structures Used
+- Array → checkup types, doctors, history storage
+- Linked List → patient queue system
+- Queue concept → history tracking
+
+### Algorithms Used
+- Priority Insertion Algorithm → manages queue order
+- Linear Search → used for ID search
+- Sequential Scheduling Algorithm → assigns room time slots
+- String Matching → compares IDs and records
+
+---
+
+## How to Compile and Run
+
+### Compile the Program
 ```bash
-gcc filename.c -o hospital
+gcc hospital.c -o hospital
