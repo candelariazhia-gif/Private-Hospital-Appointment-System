@@ -144,31 +144,26 @@ To check if GCC is installed, run:
 ```bash
 gcc --version
 
-To run the system:
 
-1. Save the file as:
+To run the system, follow these steps:
 
+### 1. Save the file
+Save the source code as:
 hospital.c
 
-2. Open terminal in the file location
+### 2. Open terminal
+Open a terminal or command prompt in the same folder where the file is located.
 
-3. Compile the program using:
-
+### 3. Compile the program
 gcc hospital.c -o hospital
 
-
-4. Run the program:
+### 4. Run the program
 
 Windows:
-
 hospital.exe
 
-
 Linux / Mac:
-
 ./hospital
 
-
+### Result
 The program will then start and allow you to use the hospital appointment system.
-
----
