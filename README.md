@@ -141,7 +141,6 @@ Before running the program, make sure you have the following installed:
 - A text editor or IDE (optional, for viewing code)
 
 To check if GCC is installed, run:
-```bash
 gcc --version
 
 
