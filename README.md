@@ -118,9 +118,17 @@ Admin can modify:
 
 ### Data Structures Used
 
-- Arrays – used for check-up types, doctor lists, room scheduling system, and patient history storage
-- Linked List – used to implement the main patient queue and supports booking, viewing, canceling, serving, emergency handling, and editing of appointments
-- Queue – defines the logical ordering of patients based on priority and arrival, and supports the serving sequence and history flow
+- Arrays  
+  Used to store check-up types, doctor lists, room scheduling data, and patient history records.  
+  Supports quick access to predefined services, doctor assignments, room time tracking, and storage of served patient information.
+
+- Linked List  
+  Used to implement the main patient queue where each patient is stored as a node.  
+  Supports dynamic operations such as booking (insertion), canceling (deletion), serving patients (removal from front), emergency handling (priority removal), viewing, and editing of appointments.
+
+- Queue
+  Applied to define the order in which patients are served and how history is recorded.  
+  The waiting list follows a priority-based queue behavior, while the history follows a FIFO enqueue-only process to preserve all served patient records.
 
 ### Algorithms Used
 
