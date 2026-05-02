@@ -3,10 +3,8 @@
 #include <string.h>
 
 /* NODE (LINKED LIST - WAITING PATIENTS)
-   Stores all patients in the hospital queue.
-   Each node represents one patient record including:
-   ID, name, age, gender, priority level, checkup type,
-   assigned doctor, room number, and appointment time.
+   Stores all patients in the hospital queue
+   Each node represents one patient record including: ID, name, age, gender, priority level, checkup type, assigned doctor, room number, and appointment time
    next points to the next patient in the queue */
 struct node {
     char id[10];
@@ -24,7 +22,7 @@ struct node {
 struct node *start = NULL;
 
 /* HISTORY QUEUE
-   Stores served patient IDs in FIFO order */
+   Stores served patient records in FIFO order */
 struct historyNode {
     char id[10];
     char name[50];
@@ -34,9 +32,8 @@ struct historyNode {
     char doctor[30];
     char checkup[30];
 };
-struct historyNode history[100];
+struct historyNode history[1000]; 
 
-int front = 0;
 int rear = -1;
 
 /* CHECKUP TYPES AND DOCTORS
@@ -53,13 +50,13 @@ char doctors[7][30] = {
 
 int countA=0,countB=0,countC=0;
 
-/* ROOM SCHEDULE SYSTEM (NEW UPGRADE)
-   Each room has its own independent time line */
+/* ROOM SCHEDULE SYSTEM
+   Each room has its own time line */
 int roomHour[10];
 int roomMinute[10];
 
-/* TIME SYSTEM INIT
-   Each room starts at 7:30 independently */
+/* TIME SYSTEM
+   Each room starts at 7:30 */
 void initRooms(){
     int i;
     for(i=0;i<10;i++){
@@ -69,7 +66,7 @@ void initRooms(){
 }
 
 /* TIME SYSTEM
-   Generates 30-minute interval schedules PER ROOM */
+   Each room has 30-minute interval schedules */
 void generateRoomTime(int room, char t[]){
     int h = roomHour[room];
     int m = roomMinute[room];
@@ -105,7 +102,7 @@ int isDuplicateID(char id[]){
     return 0;
 }
 
-/* ROOM + TIME CONFLICT CHECK
+/* ROOM AND TIME CONFLICT CHECK
    Prevents duplicate scheduling in same room and time slot */
 int isRoomTimeConflict(int room, char time[]){
     struct node *ptr = start;
@@ -257,7 +254,7 @@ void book() {
         strcpy(new_node->time, "ANY");
     } else {
 
-        /* ROOM BASED INDEPENDENT SCHEDULING */
+        /* ROOM SCHEDULING */
         do {
             generateRoomTime(new_node->room - 1, new_node->time);
         } while(isRoomTimeConflict(new_node->room, new_node->time));
@@ -293,7 +290,7 @@ void book() {
         ptr->next=new_node;
     }
 
-    /* CONFIRMED APPOINTMENT TABLE */
+    /* CONFIRMED APPOINTMENT*/
     printf("\n========================= CONFIRMED APPOINTMENT ==========================\n");
     printf("%-10s %-25s %-20s %-8s %-10s\n", "ID", "DOCTOR", "CHECKUP", "ROOM", "TIME");
     printf("--------------------------------------------------------------------------\n");
@@ -307,10 +304,15 @@ void book() {
 }
 
 /* VIEW APPOINTMENT 
-   Displays patient appoinntment*/
+   Displays patient appointment */
 void viewMy(){
     struct node *ptr=start;
     char id[10];
+
+    if(start == NULL){
+        printf("No appointments yet.\n");
+        return;
+    }
 
     printf("Enter Ticket ID: ");
     scanf("%9s",id);
@@ -335,6 +337,11 @@ void viewMy(){
 void cancel(){
     struct node *ptr=start,*prev=NULL;
     char id[10],confirm;
+
+    if(start == NULL){
+        printf("No appointments to cancel.\n");
+        return;
+    }
 
     printf("Enter Ticket ID: ");
     scanf("%9s",id);
@@ -364,6 +371,13 @@ void display(){
     struct node *ptr=start;
 
     printf("\n========================= APPOINTMENT/S =========================\n");
+    
+    if(start == NULL){
+        printf("No appointments yet.\n");
+        printf("--------------------------------------------------------------\n");
+        return;
+    }
+
     printf("%-10s %-20s %-6s %-10s %-10s\n", "ID", "NAME", "ROOM", "PRIORITY", "TIME");
     printf("--------------------------------------------------------------\n");
 
@@ -379,7 +393,6 @@ void display(){
    Moves patient to history*/
 void serve(){
     struct node *ptr;
-    int i;
 
     if(start == NULL){
         printf("Empty\n");
@@ -391,9 +404,8 @@ void serve(){
 
     printf("NOW SERVING: %s (%s)\n", ptr->id, ptr->name);
 
-    rear++;
-
-    if(rear < 100){
+    if(rear < 999){
+        rear++;
         strcpy(history[rear].id, ptr->id);
         strcpy(history[rear].name, ptr->name);
         history[rear].gender = ptr->gender;
@@ -401,6 +413,8 @@ void serve(){
         strcpy(history[rear].checkup, ptr->checkup);
         history[rear].room = ptr->room;
         strcpy(history[rear].time, ptr->time);
+    } else {
+        printf("History full! Cannot store more records.\n");
     }
 
     free(ptr);
@@ -410,23 +424,26 @@ void serve(){
    Prioritizes emergency patient*/
 void emergency(){
     struct node *ptr=start,*prev=NULL;
-    int i;
+
+    if(start == NULL){
+        printf("No patients yet.\n");
+        return;
+    }
 
     while(ptr!=NULL && ptr->priority!=1){
         prev=ptr;
         ptr=ptr->next;
     }
 
-    if(ptr==NULL){printf("No emergency\n");return;}
+    if(ptr==NULL){printf("No emergency patient found.\n");return;}
 
     if(prev==NULL) start=ptr->next;
     else prev->next=ptr->next;
 
     printf("EMERGENCY: %s (%s)\n",ptr->id,ptr->name);
 
-    rear++;
-
-    if(rear < 100){
+    if(rear < 999){
+        rear++;
         strcpy(history[rear].id, ptr->id);
         strcpy(history[rear].name, ptr->name);
         history[rear].gender = ptr->gender;
@@ -434,7 +451,10 @@ void emergency(){
         strcpy(history[rear].checkup, ptr->checkup);
         history[rear].room = ptr->room;
         strcpy(history[rear].time, ptr->time);
+    } else {
+        printf("History full! Cannot store emergency record.\n");
     }
+
     free(ptr);
 }
 
@@ -446,7 +466,7 @@ void nowServing(){
 
     if(ptr==NULL){
         printf("\n==================== NOW SERVING ====================\n");
-        printf("Empty\n");
+        printf("No patients yet.\n");
         return;
     }
 
@@ -479,12 +499,12 @@ void viewHistory(){
     printf("%-10s %-20s %-8s %-20s %-8s %-10s\n",
            "ID","NAME","GENDER","CHECKUP","ROOM","TIME");
 
-    if(rear < front){
+    if(rear == -1){
         printf("No history yet\n");
         return;
     }
 
-    for(i=front;i<=rear;i++){
+    for(i=0; i<=rear; i++){
         printf("%-10s %-20s %-8c %-20s %-8d %-10s\n",
             history[i].id,
             history[i].name,
@@ -497,67 +517,21 @@ void viewHistory(){
     printf("-----------------------------------------------------------------------------\n");
 }
 
-/* EDIT APPOINTMENT 
-   Allows admin modifications */
-void edit(){
-    struct node *ptr=start;
-    char id[10];
-    int choice,i;
-
-    printf("Enter Ticket ID: ");
-    scanf("%9s",id);
-
-    while(ptr!=NULL && !isEqual(ptr->id,id))
-        ptr=ptr->next;
-
-    if(ptr==NULL){
-        printf("Not found\n");
-        return;
-    }
-
-    printf("\nWhat do you want to edit?\n");
-    printf("1. Doctor\n2. Room\n");
-    printf("Enter: ");
-    choice = getNumber();
-
-    if(choice == 1){
-        printf("\nSelect New Doctor:\n");
-        for(i=0;i<7;i++)
-            printf("%d. %s\n",i+1,doctors[i]);
-
-        while(1){
-            printf("Enter choice: ");
-            int d = getNumber();
-            if(d>=1 && d<=7){
-                strcpy(ptr->doctor, doctors[d-1]);
-                break;
-            }
-        }
-        printf("Doctor updated\n");
-    }
-
-    else if(choice == 2){
-        printf("Enter new room number: ");
-        ptr->room = getNumber();
-        printf("Room updated\n");
-    }
-
-    else {
-        printf("Invalid choice\n");
-    }
-}
-
 /* PATIENT MENU SYSTEM */
 void patientMenu(){
     int choice;
     while(1){
         printf("\n===== PATIENT MENU =====\n");
         printf("1. Book Appointment\n2. View My Appointment\n3. Cancel Appointment\n4. Logout\nEnter: ");
-        choice=getNumber();
-        if(choice==1) book();
-        else if(choice==2) viewMy();
-        else if(choice==3) cancel();
-        else if(choice==4) return;
+        
+        choice = getNumber();
+        switch(choice){
+            case 1: book(); break;
+            case 2: viewMy(); break;
+            case 3: cancel(); break;
+            case 4: return;
+            default: printf("Invalid choice\n");
+        }
     }
 }
 
@@ -566,15 +540,18 @@ void adminMenu(){
     int choice;
     while(1){
         printf("\n===== ADMIN MENU =====\n");
-        printf("1. View All Appointments\n2. Serve Patient\n3. Override Emergency\n4. Edit Appointment\n5. Now Serving\n6. View History\n7. Logout\nEnter: ");
-        choice=getNumber();
-        if(choice==1) display();
-        else if(choice==2) serve();
-        else if(choice==3) emergency();
-        else if(choice==4) edit();
-        else if(choice==5) nowServing();
-        else if(choice==6) viewHistory();
-        else if(choice==7) return;
+        printf("1. View All Appointments\n2. Serve Patient\n3. Override Emergency\n4. Now Serving\n5. View History\n6. Logout\nEnter: ");
+        
+        choice = getNumber();
+        switch(choice){
+            case 1: display(); break;
+            case 2: serve(); break;
+            case 3: emergency(); break;
+            case 4: nowServing(); break;
+            case 5: viewHistory(); break;
+            case 6: return;
+            default: printf("Invalid choice\n");
+        }
     }
 }
 
@@ -590,10 +567,12 @@ int main(){
         printf("========================================\n");
         printf("1. Admin\n2. Patient\n3. Exit\nEnter: ");
 
-        role=getNumber();
-
-        if(role==1) adminMenu();
-        else if(role==2) patientMenu();
-        else if(role==3) exit(0);
+        role = getNumber();
+        switch(role){
+            case 1: adminMenu(); break;
+            case 2: patientMenu(); break;
+            case 3: exit(0);
+            default: printf("Invalid choice\n");
+        }
     }
 }
