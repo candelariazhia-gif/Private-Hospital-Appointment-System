@@ -2,21 +2,18 @@
 
 ## Overview
 
-This system is a console-based Hospital Appointment Management System written in C. It represents a structured hospital queue environment using a priority-based linked list. It organizes patient flow by priority level while maintaining fairness within each category.
-
-The system models real-world hospital appointment processing, including scheduling, room allocation, and patient service tracking.
+This system is a console-based hospital appointment manager written in C. It helps a small private hospital organize patient appointments, manage waiting lists by priority, assign doctors and rooms, and keep a record of served patients. The program is aimed at receptionists (admin) and patients, providing a clear text-based interface for daily operations.
 
 ---
 
 ## Purpose
 
-This system is designed to:
+The main goals of this system are:
 
-* Represent a structured hospital appointment management workflow
-* Implement priority-based patient handling (Emergency, Senior/Pregnant, Normal)
-* Prevent scheduling conflicts in room allocation
-* Maintain organized patient flow from booking to service
-* Record and preserve complete patient service history
+- Allow patients to book, view, or cancel their own appointments.
+- Let hospital staff (admin) see all waiting appointments, serve patients in the correct priority order, and review the history of served patients.
+- Automatically assign a doctor, a room, and a time slot based on the chosen checkup type.
+- Keep a complete history of all served patients for record‑keeping.
 
 ---
 
@@ -24,172 +21,114 @@ This system is designed to:
 
 ### Patient
 
-Patients are allowed to:
+Patients can:
 
-* Book an appointment
-* View their appointment using Ticket ID
-* Cancel their appointment before being served
+- Book a new appointment
+- View their own appointment using the ticket ID
+- Cancel their appointment (as long as it hasn’t been served yet)
 
 ### Admin
 
-Administrators are responsible for:
+Administrators can:
 
-* Viewing all scheduled appointments
-* Serving patients based on priority order
-* Handling emergency cases immediately
-* Monitoring current and upcoming patients
-* Viewing complete service history
+- View all waiting appointments, sorted by checkup type
+- See who is currently being served and the next three patients in line
+- Serve the next patient according to priority (Emergency first, then Senior/Pregnant, then Normal)
+- Review the complete history of already served patients
 
 ---
 
 ## System Features
 
-### Appointment Booking
+### 1. Appointment Booking
 
-This feature allows patients to:
+A patient enters their name, gender, age, chooses a checkup type (General, Laboratory, Dental, etc.) and a priority level (Emergency, Senior/Pregnant, Normal). The system then:
+- Generates a unique ticket ID.
+- Assigns a room (room number = type index + 1).
+- Assigns a time slot (e.g., “7:30 AM”)
+- Shows a summary and asks for confirmation before adding the patient to the waiting queue.
 
-* Enter personal information
-* Select a check-up category
-* Automatically assign doctor, room, and time slot
-* Generate a unique Ticket ID
-* Confirm appointment before insertion into the queue
+### 2. Priority‑Based Waiting Queues
 
----
+Instead of a single queue, the system uses **three separate queues**, one for each priority level:
+- Emergency queue – highest priority
+- Senior/Pregnant queue – medium priority
+- Normal queue – lowest priority
 
-### Priority-Based Queue System
+When serving patients, the system always takes from the highest non‑empty queue. Within the same priority, patients are served in the order they booked (FIFO).
 
-The system implements a priority classification:
+### 3. Room and Time Slot Scheduling
 
-* 1 – Emergency (highest priority)
-* 2 – Senior / Pregnant
-* 3 – Normal
+Each checkup type has its own independent schedule:
+- Operating hours start at 7:30 AM, with 30‑minute interval until 5:00 PM.
+- If no slot is available, the booking is refused.
 
-Patients are:
+### 4. Ticket ID System
 
-* Ordered based on priority level
-* Maintained in FIFO order within the same priority group
+Every patient receives a unique ID that shows their priority:
+- `A001`, `A002`, … → Emergency
+- `B001`, `B002`, … → Senior or Pregnant
+- `C001`, `C002`, … → Normal
 
----
+IDs are never reused, even after cancellation.
 
-### Room Scheduling System
+### 5. Now Serving + Next Patients
 
-This module represents independent scheduling per hospital room:
+The admin can see:
+- The patient currently being served (front of the highest non‑empty queue)
+- Up to three next patients ( from all queues, in priority order)
 
-* Each room operates on an independent timeline
-* Operating hours start at 7:30 AM
-* Each appointment occupies a 30-minute time slot
-* The system prevents overlapping appointments per room
-* Time slots are automatically generated per room basis
+This display does not change the queue; it only shows information.
 
----
+### 6. Patient History
 
-### Ticket ID System
+All served patients are stored in a singly linked list. The history preserves:
+- Ticket ID, name, sex
+- Checkup type and assigned doctor
+- Room number and appointment time
 
-Each patient receives a unique identifier:
+The list can be displayed at any time by the admin.
 
-* A### → Emergency
-* B### → Senior / Pregnant
-* C### → Normal
+### 7. Search and Cancellation
 
-The system ensures no duplicate Ticket IDs exist within the queue.
+Patients can search for their own appointment by entering their ticket ID. The system performs a **linear search** through all three active queues to find the matching patient. If found, the patient can cancel the appointment (confirmation required).
 
----
+### 8. Input Validation
 
-### Queue Management System
+All user inputs are validated:
+- Numbers (age, menu choices) must be within the correct range, and non‑numeric input is rejected.
+- Names may only contain letters, spaces, and periods.
+- Sex must be `M` or `F` (case‑insensitive).
+- Ticket IDs are checked for existence before operations.
 
-The system uses a linked list structure to represent the patient queue. It supports:
+## Data Structures and Algorithms Used
 
-* Priority-based insertion
-* Dynamic addition and removal of nodes
-* Ordered traversal of patient records
+### Data Structures
 
----
+- **Array** – Used for fixed lookup tables and a slot occupancy tracker.  
+  - `checkupTypes[]` and `doctorNames[]` store checkup types and matching doctors. They support the **checkup type selection** during booking (function `bookAppointment`) and the **view appointment** display (`viewMyAppointment`).  
+  - `timeSlots[]` holds all appointment hours. It supports the **time slot assignment** feature (`assignSlot`) and the **appointment summary** display.  
+  - `isSlotTaken[][]` records which time slots are occupied. It is used only by `assignSlot` (to find a free slot) and `freeSlot` (to release a slot when an appointment is cancelled).  
 
-### Emergency Handling
+- **Queue (linear array with front/rear)** – Three priority queues: `emergencyQueue`, `seniorQueue`, `normalQueue`.  
+  - Supports **enqueue** (booking, `bookAppointment`), **dequeue** (serving, `serveNextPatient`), **search by ID** (view/cancel, `findPatientById` and `removePatientFromQueue`), and **compaction** (reuses empty front space, called inside `enqueue`).  
+  - These queues are the core of all waiting‑list operations: booking, serving, cancelling, and displaying the now‑serving information.
 
-Emergency handling:
-
-* Searches for emergency-level patients (priority 1)
-* Removes and processes them immediately
-* Overrides normal queue order when necessary
-* Transfers patient records to history after service
-
----
-
-### Now Serving Module
-
-This module:
-
-* Displays the current patient being served
-* Shows the next three patients in queue
-* Provides visibility of queue progression
+- **Linked List** – History of served patients (`historyHead`).  
+  - Supports **adding a served patient** (`addToHistory`) and **displaying the history** (`viewHistoryList`).  
+  - Used only for record‑keeping; does not affect the active queues.
 
 ---
 
-### Patient History System
+### Algorithms
 
-The system maintains a FIFO-based record structure of served patients, storing:
+- **Linear Search** – Implemented in `findPatientById()`.  
+  - Scans each active queue (emergency, senior, normal) one patient at a time to locate an appointment by its ticket ID.  
+  - Supports the **view my appointment** feature (`viewMyAppointment`) and the **cancel appointment** feature (`cancelAppointment`).
 
-* Ticket ID
-* Name
-* Gender
-* Check-up type
-* Doctor assigned
-* Room number
-* Appointment time
-
-This ensures complete traceability of hospital service flow.
-
----
-
-### Search and Cancellation Features
-
-* Patients can search their appointment using Ticket ID
-* Appointments can be cancelled before being served
-* The system removes nodes from the linked list safely
-
----
-
-### Input Validation System
-
-The system enforces:
-
-* Numeric-only input for numbers
-* Alphabet-only input for names
-* Valid gender input (F/M only)
-* Controlled menu selection inputs
-
----
-
-## Data Structures Used and Their Supported Features
-
-* Arrays
-  Used to store check-up types, doctor lists, room scheduling data, and patient history records.
-  Supports quick access to predefined services, doctor assignments, room time tracking, and storage of served patient information.
-
-* Linked List
-  Used to implement the main patient queue where each patient is stored as a node.
-  Supports dynamic operations such as booking (insertion), canceling (deletion), serving patients (removal from front), emergency handling (priority removal), and viewing of appointments.
-
-* Queue (FIFO Behavior – Conceptual Implementation)
-  Applied to define the order in which patients are served and how history is recorded.
-  The waiting list follows a priority-based queue behavior, while the history follows a FIFO enqueue-only process to preserve all served patient records without deletion.
-
----
-
-## Algorithms Used and Their System Functions
-
-* Priority Insertion Algorithm
-  Manages the ordering of patients in the linked list based on priority level (Emergency, Senior/Pregnant, Normal).
-  This directly supports the Book Appointment feature, ensuring higher-priority patients are placed at the front of the queue while maintaining FIFO order within the same priority level. It also affects the Serve Patient and Now Serving display since these depend on correct queue ordering.
-
-* Linear Search Algorithm
-  Traverses the linked list node-by-node to locate a patient’s record using Ticket ID.
-  This supports the View My Appointment, Cancel Appointment, and internal validation processes where specific patient records must be identified before performing operations.
-
-* Time Scheduling Algorithm
-  Generates structured 30-minute intervals per room starting from 7:30 AM.
-  Ensures room-based scheduling independence, prevents overlapping appointments, and maintains consistent time allocation across all check-up rooms.
+- **Merge Sort** – Implemented in `mergeSort()` and `merge()`.  
+  - Collects all waiting patients from the three priority queues into a single array (`viewAllAppointments`), sorts them by checkup type (`typeIndex`), then displays them in groups.  
+  - Supports the **view all waiting appointments** feature (`viewAllAppointments`), providing a clear, grouped output for the admin.
 
 ---
 
@@ -222,15 +161,3 @@ hospital.exe
 
 Linux / macOS:
 ./hospital
-
----
-
-## System Output Behavior
-
-Upon execution, the program represents a hospital management environment where users can:
-
-* Access patient and admin menus
-* Manage appointments dynamically
-* Observe priority-based patient processing
-* Track real-time queue progression
-* View complete service history
